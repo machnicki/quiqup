@@ -5,8 +5,8 @@ I have tried to use angular-google-maps, but it seems to be too heavy and not ma
 
 I have decided to use http://leafletjs.com/, which is simplest solution.
 
-##Bootstrap, UX
-Soon I'll include some UI
+##UI
+I have used Bootstrap for styling
 
 ##Run the app
 Start the server

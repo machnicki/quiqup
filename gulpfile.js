@@ -3,6 +3,7 @@
 var gulp = require('gulp'),
     concat = require('gulp-concat'),
     uglify = require('gulp-uglify'),
+    minify = require('gulp-minify-css'),
     rename = require('gulp-rename'),
     browserSync = require('browser-sync').create(),
     reload= browserSync.reload;
@@ -21,7 +22,15 @@ var srcJs = [
       '!./public/js/main.min.js'
     ];
 
-// Concatenate and mynifyJS Files
+//these CSSs will be concatenated into one file
+var srcCss = [
+  './public/bower_components/bootstrap/dist/css/bootstrap.css',
+  './public/bower_components/leaflet/dist/leaflet.css',
+  '!./public/css/main.css',
+  '!./public/css/main.min.css'
+];
+
+// Concatenate and mynify JS Files
 gulp.task('js', function() {
   return gulp.src(srcJs)
     .pipe(concat('main.js'))
@@ -31,10 +40,22 @@ gulp.task('js', function() {
     .pipe(gulp.dest('./public/js/'));
 });
 
+
+// Concatenate and mynify CSS Files
+gulp.task('css', function() {
+  return gulp.src(srcCss)
+    .pipe(concat('main.css'))
+    .pipe(gulp.dest('./public/css/'))
+    .pipe(rename({suffix: '.min'}))
+    .pipe(minify())
+    .pipe(gulp.dest('./public/css/'));
+});
+
 // Watch changes in source files
 gulp.task('watch', function() {
   gulp.watch(srcJs, ['js']);
-      //.on('change', reload);
+
+  gulp.watch(srcCss, ['css']);
 });
 
 gulp.task('serve', function() {
@@ -45,6 +66,6 @@ gulp.task('serve', function() {
   });
 });
 
-gulp.task('build', ['js']);
+gulp.task('build', ['css', 'js']);
 
 gulp.task('default', ['build', 'watch', 'serve']);

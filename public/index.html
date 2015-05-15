@@ -2,14 +2,19 @@
 <html>
 <head lang="en">
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Quiqup test</title>
-    <link rel="stylesheet" href="/bower_components/leaflet/dist/leaflet.css" />
-    <script src="/js/main.js"></script>
+    <link rel="stylesheet" href="/css/main.min.css" />
+    <script src="/js/main.min.js"></script>
 </head>
-<body ng-app="quiqupTest">
+<body class="container" ng-app="quiqupTest">
     <div ng-controller="TIMSCtrl">
         <leaflet center="london" markers="markers" height="480px" width="100%"></leaflet>
-        <h1>Quiqup test application</h1>
+        <h1>Traffic Disruptions in London</h1>
+        <div ng-show="markers.length > 0">
+            <p class="lead">We found <mark>{{markers.length}}</mark> disruptions</p>
+            <p>Click on marker to see details</p>
+        </div>
     </div>
 </body>
 </html>
