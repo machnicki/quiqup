@@ -12,7 +12,6 @@ var gulp = require('gulp'),
 //these JSs will be concatenated into one file
 var srcJs = [
       './public/bower_components/angular/angular.js',
-      './public/bower_components/angular-bootstrap/ui-bootstrap.js',
       './public/bower_components/leaflet/dist/leaflet.js',
       './public/bower_components/angular-leaflet-directive/dist/angular-leaflet-directive.js',
       './public/bower_components/x2js/xml2json.js',
