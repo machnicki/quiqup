@@ -15,7 +15,6 @@ var QuiqupTest;
 
       //data is dividing into pieces and assigning to scope by timers (better performance)
       if (data && data.constructor == Array && (length = data.length)) {
-
         iterationsQty = Math.ceil(length/50);
 
         for(var i=0; i < iterationsQty; i++) {
@@ -41,6 +40,7 @@ var QuiqupTest;
 
     });
 
+    //set the starting position
     angular.extend($scope, {
       london: {
         lat: 51.505,
@@ -54,6 +54,7 @@ var QuiqupTest;
     });
   }]);
 
+  //get data from webservice and transform from XML to JSON
   QT.factory('TIMSSource', ['$http', 'x2js', function($http, x2js) {
     return {
       get: function(callback) {
