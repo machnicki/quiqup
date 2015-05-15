@@ -4,16 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Quiqup test</title>
-    <link rel="stylesheet" href="/css/main.min.css" />
-    <script src="/js/main.min.js"></script>
+    <link rel="stylesheet" href="/css/main.css" />
+    <script src="/js/main.js"></script>
 </head>
 <body class="container" ng-app="quiqupTest">
     <div ng-controller="TIMSCtrl">
-        <leaflet center="london" markers="markers" height="480px" width="100%"></leaflet>
+        <leaflet center="london" markers="markersFiltered" height="480px" width="100%"></leaflet>
         <h1>Traffic Disruptions in London</h1>
         <div ng-show="markers.length > 0">
-            <p class="lead">We found <mark>{{markers.length}}</mark> disruptions</p>
+            <p class="lead">We found <mark>{{markersFiltered.length}}</mark> disruptions</p>
             <p>Click on marker to see details</p>
+            <form class="form-horizontal">
+                <div class="form-group form-group-lg">
+                    <label class="col-sm-2 control-label" for="formStreet">Filter by street</label>
+                    <div class="col-sm-10">
+                        <input class="form-control" type="text" id="formStreet" placeholder="Street name" ng-model="street">
+                    </div>
+                </div>
+            </form>
+            <button type="button" class="btn btn-primary" ng-click="getNewData()">Refresh results</button>
         </div>
     </div>
 </body>

@@ -6,39 +6,73 @@ var QuiqupTest;
   QT = angular.module('quiqupTest', ['cb.x2js', 'leaflet-directive']);
 
   QT.controller('TIMSCtrl', ['$scope', 'TIMSSource', '$timeout', function($scope, TIMSSource, $timeout) {
-    $scope.markers = [];
+    $scope.street = '';
 
-    TIMSSource.get(function(data) {
-      var length,
+    $scope.getNewData = function() {
+      $scope.markers = [];
+      $scope.markersFiltered = []; //filtered markers by street
+
+      TIMSSource.get(function(data) {
+        var length,
           iterationsQty,
           dataPiece;
 
-      //data is dividing into pieces and assigning to scope by timers (better performance)
-      if (data && data.constructor == Array && (length = data.length)) {
-        iterationsQty = Math.ceil(length/50);
+        //data is dividing into pieces and assigning to scope by timers (better performance)
+        if (data && data.constructor == Array && (length = data.length)) {
+          iterationsQty = Math.ceil(length/50);
 
-        for(var i=0; i < iterationsQty; i++) {
-          dataPiece = data.splice(0, 50);
+          for(var i=0; i < iterationsQty; i++) {
+            dataPiece = data.splice(0, 50);
 
-          $timeout((function(dataPiece) {
-            var markerPosition;
+            $timeout((function(dataPiece) {
+              var markerPosition,
+                  streets = []; //use for filters
 
-            dataPiece.forEach(function(item, index) {
-              markerPosition = item.CauseArea.DisplayPoint.Point.coordinatesLL.split(',');
+              dataPiece.forEach(function(item, index) {
+                markerPosition = item.CauseArea.DisplayPoint.Point.coordinatesLL.split(',');
 
-              $scope.markers.push({
-                lat: parseFloat(markerPosition[1]),
-                lng: parseFloat(markerPosition[0]),
-                focus: false,
-                message: item.comments,
-                draggable: false
+                if(item.CauseArea.Streets && item.CauseArea.Streets.Street && item.CauseArea.Streets.Street.constructor == Array) {
+                  item.CauseArea.Streets.Street.forEach(function(street) {
+                    streets.push(street.name);
+                  });
+                }
+
+                $scope.markers.push({
+                  lat: parseFloat(markerPosition[1]),
+                  lng: parseFloat(markerPosition[0]),
+                  focus: false,
+                  message: item.comments,
+                  draggable: false,
+                  streets: streets.join(', ')
+                });
               });
-            });
-          })(dataPiece), 0);
-        }
-      }
+            })(dataPiece), 0);
+          }
 
+          $scope.getMarkersFiltered();
+        }
+      });
+    };
+
+    $scope.getNewData();
+
+    $scope.$watch('street', function() {
+      $scope.getMarkersFiltered();
     });
+
+    $scope.getMarkersFiltered = function() {
+      $scope.markersFiltered = $scope.markers.filter(function(marker) {
+        if ($scope.street) {
+          if (marker.streets && marker.streets.indexOf($scope.street) > -1) {
+            return true;
+          } else {
+            return false;
+          }
+        } else {
+          return true;
+        }
+      });
+    };
 
     //set the starting position
     angular.extend($scope, {
