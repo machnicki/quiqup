@@ -31,6 +31,10 @@ var srcCss = [
   '!./public/css/main.min.css'
 ];
 
+var srcCssMap = [
+  './public/bower_components/bootstrap/dist/css/bootstrap.css.map'
+];
+
 // Concatenate and mynify JS Files
 gulp.task('js', function() {
   return gulp.src(srcJs)
@@ -52,6 +56,11 @@ gulp.task('css', function() {
     .pipe(gulp.dest('./public/css/'));
 });
 
+gulp.task('cssMap', function() {
+  return gulp.src(srcCssMap)
+    .pipe(gulp.dest('./public/css/'));
+});
+
 // Watch changes in source files
 gulp.task('watch', function() {
   gulp.watch(srcJs, ['js']);
@@ -68,6 +77,6 @@ gulp.task('serve', function() {
     }));
 });
 
-gulp.task('build', ['css', 'js']);
+gulp.task('build', ['css', 'cssMap', 'js']);
 
 gulp.task('default', ['build', 'watch', 'serve']);
