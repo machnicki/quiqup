@@ -7,10 +7,16 @@
     <link rel="stylesheet" href="/css/main.css" />
     <script src="/js/main.js"></script>
 </head>
-<body class="container" ng-app="quiqupTest">
-    <div ng-controller="TIMSCtrl">
-        <div ng-class="{is_loading: isLoading}">
+<body ng-app="quiqupTest">
+    <div class="container" ng-controller="TIMSCtrl">
+        <div class="map-container">
             <leaflet center="london" markers="markersFiltered" height="480px" width="100%"></leaflet>
+            <div ng-show="isLoading" class="spinner-container ng-hide-animate">
+                <div class="spinner">
+                    <div class="double-bounce1"></div>
+                    <div class="double-bounce2"></div>
+                </div>
+            </div>
         </div>
         <h1>Traffic Disruptions in London</h1>
         <div ng-show="markers.length > 0">

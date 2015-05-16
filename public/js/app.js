@@ -8,10 +8,10 @@ var QuiqupTest;
   QT.controller('TIMSCtrl', ['$scope', 'TIMSSource', '$timeout', '$q', function($scope, TIMSSource, $timeout, $q) {
     var promiseGetMarkersFiltered; //reference to timeout for filtetring markers by street
 
-    $scope.isLoading = true; //true when map is waiting for new markers
     $scope.street = '';
 
     $scope.getNewData = function() {
+      $scope.isLoading = true; //true when map is waiting for new markers
       $scope.markers = [];
       $scope.markersFiltered = []; //filtered markers by street
 

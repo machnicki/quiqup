@@ -25,7 +25,9 @@ var srcJs = [
 //these CSSs will be concatenated into one file
 var srcCss = [
   './public/bower_components/bootstrap/dist/css/bootstrap.css',
+  './public/bower_components/angular/angular-csp.css',
   './public/bower_components/leaflet/dist/leaflet.css',
+  './public/css/*.css',
   '!./public/css/main.css',
   '!./public/css/main.min.css'
 ];
