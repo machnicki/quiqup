@@ -5,8 +5,7 @@ var gulp = require('gulp'),
     uglify = require('gulp-uglify'),
     minify = require('gulp-minify-css'),
     rename = require('gulp-rename'),
-    browserSync = require('browser-sync').create(),
-    reload= browserSync.reload;
+    webserver = require('gulp-webserver');
 
 
 //these JSs will be concatenated into one file
@@ -61,11 +60,12 @@ gulp.task('watch', function() {
 });
 
 gulp.task('serve', function() {
-  browserSync.init({
-    server: {
-      baseDir: "./public/"
-    }
-  });
+  gulp.src('./public/')
+    .pipe(webserver({
+      livereload: false,
+      directoryListing: false,
+      open: true
+    }));
 });
 
 gulp.task('build', ['css', 'js']);
