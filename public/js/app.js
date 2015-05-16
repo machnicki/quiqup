@@ -6,7 +6,7 @@ var QuiqupTest;
   QT = angular.module('quiqupTest', ['cb.x2js', 'leaflet-directive']);
 
   QT.controller('TIMSCtrl', ['$scope', 'TIMSSource', '$timeout', '$q', function($scope, TIMSSource, $timeout, $q) {
-    var promiseGetMarkersFilteret; //reference to timeout for filtetring markers by street
+    var promiseGetMarkersFiltered; //reference to timeout for filtetring markers by street
 
     $scope.isLoading = true; //true when map is waiting for new markers
     $scope.street = '';
@@ -79,9 +79,9 @@ var QuiqupTest;
 
     //filter by street
     $scope.$watch('street', _.debounce(function() {
-      $timeout.cancel(promiseGetMarkersFilteret);
+      $timeout.cancel(promiseGetMarkersFiltered);
 
-      promiseGetMarkersFilteret = $timeout(function() {
+      promiseGetMarkersFiltered = $timeout(function() {
         $scope.getMarkersFiltered();
       }, 0);
     }, 500));
