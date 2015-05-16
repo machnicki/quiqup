@@ -29,36 +29,40 @@ var QuiqupTest;
           for(var i=0; i < iterationsQty; i++) {
             deferred = $q.defer();
 
+            allPromises.push(deferred.promise);
+
             dataPiece = data.splice(0, 50);
 
-            $timeout((function(dataPiece, deferred) {
-              var markerPosition,
-                  markers = [],
-                  streets = []; //use for filters
+            (function(dataPiece, deferred) {
 
-              dataPiece.forEach(function(item, index) {
-                markerPosition = item.CauseArea.DisplayPoint.Point.coordinatesLL.split(',');
+              $timeout(function() {
+                var markerPosition,
+                    markers = [],
+                    streets = []; //use for filters
 
-                if(item.CauseArea.Streets && item.CauseArea.Streets.Street && item.CauseArea.Streets.Street.constructor == Array) {
-                  item.CauseArea.Streets.Street.forEach(function(street) {
-                    streets.push(street.name);
+                dataPiece.forEach(function(item, index) {
+                  markerPosition = item.CauseArea.DisplayPoint.Point.coordinatesLL.split(',');
+
+                  if(item.CauseArea.Streets && item.CauseArea.Streets.Street && item.CauseArea.Streets.Street.constructor == Array) {
+                    item.CauseArea.Streets.Street.forEach(function(street) {
+                      streets.push(street.name);
+                    });
+                  }
+
+                  markers.push({
+                    lat: parseFloat(markerPosition[1]),
+                    lng: parseFloat(markerPosition[0]),
+                    focus: false,
+                    message: item.comments,
+                    draggable: false,
+                    streets: streets.join(', ')
                   });
-                }
-
-                markers.push({
-                  lat: parseFloat(markerPosition[1]),
-                  lng: parseFloat(markerPosition[0]),
-                  focus: false,
-                  message: item.comments,
-                  draggable: false,
-                  streets: streets.join(', ')
                 });
-              });
 
-              deferred.resolve(markers);
-            })(dataPiece, deferred), 0);
+                deferred.resolve(markers);
+              }, 0);
+            })(dataPiece, deferred);
 
-            allPromises.push(deferred.promise);
           }
 
           //one markers assignment into $scope for better performance
