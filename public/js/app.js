@@ -2,10 +2,13 @@
 
 var QuiqupTest;
 
-(function (window, QT) {
+(function (window, QT, _) {
   QT = angular.module('quiqupTest', ['cb.x2js', 'leaflet-directive']);
 
   QT.controller('TIMSCtrl', ['$scope', 'TIMSSource', '$timeout', function($scope, TIMSSource, $timeout) {
+    var promiseGetMarkersFilteret; //reference to timeout for filtetring markers by street
+
+    $scope.isLoading = true; //true when map is waiting for new markers
     $scope.street = '';
 
     $scope.getNewData = function() {
@@ -50,17 +53,25 @@ var QuiqupTest;
           }
 
           $scope.getMarkersFiltered();
+
+          $scope.isLoading = false;
         }
       });
     };
 
     $scope.getNewData();
 
-    $scope.$watch('street', function() {
-      $scope.getMarkersFiltered();
-    });
+    $scope.$watch('street', _.debounce(function() {
+      $timeout.cancel(promiseGetMarkersFilteret);
+
+      promiseGetMarkersFilteret = $timeout(function() {
+        $scope.getMarkersFiltered();
+      }, 0);
+    }, 500));
 
     $scope.getMarkersFiltered = function() {
+
+
       $scope.markersFiltered = $scope.markers.filter(function(marker) {
         if ($scope.street) {
           if (marker.streets && marker.streets.indexOf($scope.street) > -1) {
@@ -104,4 +115,4 @@ var QuiqupTest;
     };
   }]);
 
-})(window, QuiqupTest);
+})(window, QuiqupTest, _);
