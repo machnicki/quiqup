@@ -8,6 +8,9 @@ I have decided to use http://leafletjs.com/, which is simplest solution.
 ##UI
 I have used Bootstrap for styling
 
+##ToDo
+Use Node.js to get XML and serve transformed data
+
 ##Run the app
 Start the server
 ``` npm start ```

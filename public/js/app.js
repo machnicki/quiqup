@@ -2,43 +2,109 @@
 
 var QuiqupTest;
 
-(function (window, QT) {
+(function (window, QT, _) {
   QT = angular.module('quiqupTest', ['cb.x2js', 'leaflet-directive']);
 
-  QT.controller('TIMSCtrl', ['$scope', 'TIMSSource', '$timeout', function($scope, TIMSSource, $timeout) {
-    $scope.markers = [];
+  QT.controller('TIMSCtrl', ['$scope', 'TIMSSource', '$timeout', '$q', function($scope, TIMSSource, $timeout, $q) {
+    var promiseGetMarkersFiltered; //reference to timeout for filtetring markers by street
 
-    TIMSSource.get(function(data) {
-      var length,
+    $scope.street = '';
+
+    $scope.getNewData = function() {
+      $scope.isLoading = true; //true when map is waiting for new markers
+      $scope.markers = [];
+      $scope.markersFiltered = []; //filtered markers by street
+
+      TIMSSource.get(function(data) {
+        var length,
           iterationsQty,
-          dataPiece;
+          dataPiece,
+          deferred, //use to check the end of looping in timers
+          allPromises = [];
 
-      //data is dividing into pieces and assigning to scope by timers (better performance)
-      if (data && data.constructor == Array && (length = data.length)) {
-        iterationsQty = Math.ceil(length/50);
+        //data is dividing into pieces and assigning to $scope by timers (better performance)
+        if (data && data.constructor == Array && (length = data.length)) {
+          iterationsQty = Math.ceil(length/50);
 
-        for(var i=0; i < iterationsQty; i++) {
-          dataPiece = data.splice(0, 50);
+          for(var i=0; i < iterationsQty; i++) {
+            deferred = $q.defer();
 
-          $timeout((function(dataPiece) {
-            var markerPosition;
+            allPromises.push(deferred.promise);
 
-            dataPiece.forEach(function(item, index) {
-              markerPosition = item.CauseArea.DisplayPoint.Point.coordinatesLL.split(',');
+            dataPiece = data.splice(0, 50);
 
-              $scope.markers.push({
-                lat: parseFloat(markerPosition[1]),
-                lng: parseFloat(markerPosition[0]),
-                focus: false,
-                message: item.comments,
-                draggable: false
-              });
-            });
-          })(dataPiece), 0);
+            (function(dataPiece, deferred) {
+
+              $timeout(function() {
+                var markerPosition,
+                    markers = [],
+                    streets = []; //use for filters
+
+                dataPiece.forEach(function(item, index) {
+                  markerPosition = item.CauseArea.DisplayPoint.Point.coordinatesLL.split(',');
+
+                  if(item.CauseArea.Streets && item.CauseArea.Streets.Street && item.CauseArea.Streets.Street.constructor == Array) {
+                    item.CauseArea.Streets.Street.forEach(function(street) {
+                      streets.push(street.name);
+                    });
+                  }
+
+                  markers.push({
+                    lat: parseFloat(markerPosition[1]),
+                    lng: parseFloat(markerPosition[0]),
+                    focus: false,
+                    message: item.comments,
+                    draggable: false,
+                    streets: streets.join(', ')
+                  });
+                });
+
+                deferred.resolve(markers);
+              }, 0);
+            })(dataPiece, deferred);
+
+          }
+
+          //one markers assignment into $scope for better performance
+          $q.all(allPromises).then(function(data) {
+            var newMarkers = [];
+
+            $scope.markers = newMarkers.concat.apply(newMarkers, data);
+
+            $scope.getMarkersFiltered();
+
+            $scope.isLoading = false;
+          });
         }
-      }
+      });
+    };
 
-    });
+    $scope.getNewData();
+
+    //filter by street
+    $scope.$watch('street', _.debounce(function() {
+      $timeout.cancel(promiseGetMarkersFiltered);
+
+      promiseGetMarkersFiltered = $timeout(function() {
+        $scope.getMarkersFiltered();
+      }, 0);
+    }, 500));
+
+    //on view I use $scope.markersFiltered array
+    $scope.getMarkersFiltered = function() {
+
+      $scope.markersFiltered = $scope.markers.filter(function(marker) {
+        if ($scope.street) {
+          if (marker.streets && marker.streets.indexOf($scope.street) > -1) {
+            return true;
+          } else {
+            return false;
+          }
+        } else {
+          return true;
+        }
+      });
+    };
 
     //set the starting position
     angular.extend($scope, {
@@ -70,4 +136,4 @@ var QuiqupTest;
     };
   }]);
 
-})(window, QuiqupTest);
+})(window, QuiqupTest, _);

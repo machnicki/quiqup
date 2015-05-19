@@ -5,13 +5,13 @@ var gulp = require('gulp'),
     uglify = require('gulp-uglify'),
     minify = require('gulp-minify-css'),
     rename = require('gulp-rename'),
-    browserSync = require('browser-sync').create(),
-    reload= browserSync.reload;
+    webserver = require('gulp-webserver');
 
 
 //these JSs will be concatenated into one file
 var srcJs = [
       './public/bower_components/angular/angular.js',
+      './public/bower_components/lodash/lodash.js',
       './public/bower_components/leaflet/dist/leaflet.js',
       './public/bower_components/angular-leaflet-directive/dist/angular-leaflet-directive.js',
       './public/bower_components/x2js/xml2json.js',
@@ -24,9 +24,15 @@ var srcJs = [
 //these CSSs will be concatenated into one file
 var srcCss = [
   './public/bower_components/bootstrap/dist/css/bootstrap.css',
+  './public/bower_components/angular/angular-csp.css',
   './public/bower_components/leaflet/dist/leaflet.css',
+  './public/css/*.css',
   '!./public/css/main.css',
   '!./public/css/main.min.css'
+];
+
+var srcCssMap = [
+  './public/bower_components/bootstrap/dist/css/bootstrap.css.map'
 ];
 
 // Concatenate and mynify JS Files
@@ -50,6 +56,11 @@ gulp.task('css', function() {
     .pipe(gulp.dest('./public/css/'));
 });
 
+gulp.task('cssMap', function() {
+  return gulp.src(srcCssMap)
+    .pipe(gulp.dest('./public/css/'));
+});
+
 // Watch changes in source files
 gulp.task('watch', function() {
   gulp.watch(srcJs, ['js']);
@@ -58,13 +69,14 @@ gulp.task('watch', function() {
 });
 
 gulp.task('serve', function() {
-  browserSync.init({
-    server: {
-      baseDir: "./public/"
-    }
-  });
+  gulp.src('./public/')
+    .pipe(webserver({
+      livereload: false,
+      directoryListing: false,
+      open: true
+    }));
 });
 
-gulp.task('build', ['css', 'js']);
+gulp.task('build', ['css', 'cssMap', 'js']);
 
 gulp.task('default', ['build', 'watch', 'serve']);

@@ -4,4 +4,5 @@ public/js/main.js
 public/js/main.min.js
 public/css/main.css
 public/css/main.min.css
+public/css/*.map
 .idea
